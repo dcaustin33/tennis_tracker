@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "tennis-tracker"
+version = "0.1.0"
+description = ""
+authors = ["dcaustin33 <dcaustin33@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+numpy = "^2.1.2"
+scipy = "^1.14.1"
+opencv-python = "^4.10.0.84"
+torch = "^2.5.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
