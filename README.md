@@ -1,0 +1,3 @@
+In the download data directory we have script to download the data (download_videos.py) extract all the frames to the frames directory (extract_frames.py) and then extract all keypoints using the tracknet model (extract_keypoints.py). The last step creates a label.jsonl file that discards any frames that do not have all keypoints thereby helping us to filter frames so we are only training on the broadcast or a good view of the court and no player shots or highlights.
+
+In the pseudo_label directory we have code to label the players with GroundingDino - this should allow some distillation.

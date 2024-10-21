@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 from scipy.spatial import distance
-from utils import line_intersection
 import numpy as np
 from sympy import Line 
 import sympy
