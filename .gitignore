@@ -3,3 +3,4 @@
 *.webm
 **/frames
 **/__pycache__
+**/GroundingDINO

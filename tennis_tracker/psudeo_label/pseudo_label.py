@@ -1,6 +1,7 @@
 import os
 
 import cv2
+import numpy as np
 import torch
 from groundingdino.util.inference import (
     annotate,
@@ -9,11 +10,18 @@ from groundingdino.util.inference import (
     load_model,
     predict,
 )
+from tennis_tracker.player_location.homography import transform_points
 
 from tennis_tracker.download_data.extract_keypoints import (
     read_json,
     write_to_json_file,
 )
+
+def output_point(m: np.array, points: np.array) -> list:
+    """points should be in shape (-1, 1, 2)"""
+    outputs = cv2.perspectiveTransform(points, m)
+    # output will be -1, 1, 2
+    return outputs.reshape(-1, 2)
 
 if __name__ == "__main__":
 
@@ -21,6 +29,7 @@ if __name__ == "__main__":
         "GroundingDINO_SwinT_OGC.py",
         "/Users/derek/Desktop/GroundingDINO/groundingdino_swint_ogc.pth",
     )
+    model = torch.compile(model)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model = model.to(device)
     TEXT_PROMPT = "tennis player"
@@ -59,6 +68,14 @@ if __name__ == "__main__":
             all_boxes = []
             for box in im_boxes:
                 all_boxes.append(f"0 {box[0]} {box[1]} {box[2]} {box[3]}")
-            lines.append(all_boxes)
             data[batch_images[im_num]]['boxes'] = all_boxes
+            lines.append(all_boxes)
+            
+            # now we translate to the world coords
+            image_dims = data[batch_images[im_num]]['image_dims'].copy()
+            m = np.array(data[batch_images[im_num]]['m'].copy())
+            transformed_points = transform_points(m, im_boxes.copy(), image_dims)
+            data[batch_images[im_num]]['transformed_coords'] = transformed_points
+            
+            
     write_to_json_file(OUTPUT_JSON_PATH, data)

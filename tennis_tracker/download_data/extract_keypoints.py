@@ -3,6 +3,7 @@ import os
 import pathlib
 import time
 
+import cv2
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -75,16 +76,24 @@ def write_to_json_file(file_path: str, data: dict) -> None:
 
     with open(file_path, "r+") as f:
         existing_data = json.load(f)
-        
+
         existing_data.update(data)
         f.seek(0)
         json.dump(existing_data, f, indent=4, ensure_ascii=False)
         f.truncate()
-        
+
+
 def read_json_file(file_path: str) -> dict:
     with open(file_path, "r+") as f:
         existing_data = json.load(f)
     return existing_data
+
+
+def read_court_coords(file_path: str):
+    with open(file_path, "r") as f:
+        lines = f.readlines()
+    lines = [line.strip().split(",") for line in lines]
+    return [[int(x), int(y)] for x, y in lines]
 
 
 if __name__ == "__main__":
@@ -96,12 +105,14 @@ if __name__ == "__main__":
     json_file_path = (
         "/Users/derek/Desktop/tennis_tracker/tennis_tracker/download_data/labels.json"
     )
+    court_coordinates_path = "/Users/derek/Desktop/tennis_tracker/tennis_tracker/player_location/padded_click_coordinates.txt"
     batch_size = 10
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     model = BallTrackerNet(out_channels=15)
     model.load_state_dict(torch.load(model_path, map_location="mps"))
     model.eval()
+    model = torch.compile(model)
     model = model.to(device)
 
     dataset = frame_dataset(dataset_path)
@@ -116,6 +127,9 @@ if __name__ == "__main__":
         os.remove(json_file_path)
 
     time_now = time.time()
+    # we are also going to get the homography matrix
+    court_coordinates = np.array(read_court_coords(court_coordinates_path))
+
     for idx, batch in enumerate(dataloader):
         if idx % 10 == 0:
             print(idx, time.time() - time_now)
@@ -140,11 +154,12 @@ if __name__ == "__main__":
             # we are using this as our filtering criteria so we only capture good points
             if (None, None) in points:
                 continue
+            m, _ = cv2.findHomography(np.array(points), court_coordinates)
             lines[img_paths[pred_idx]] = {
                 "keypoints": [[int(point[0]), int(point[1])] for point in points],
+                "image_dims": imgs[pred_idx].shape[-2:],
+                "m": m.tolist(),
             }
         # if len(lines) > 100:
-        print("writing")
         write_to_json_file(json_file_path, lines)
-        print("wrote")
         lines = {}
