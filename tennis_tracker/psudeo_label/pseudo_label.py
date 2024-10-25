@@ -14,7 +14,7 @@ from groundingdino.util.inference import (
 from tennis_tracker.player_location.homography import transform_points
 
 from tennis_tracker.download_data.extract_keypoints import (
-    read_json,
+    read_json_file,
     write_to_json_file,
 )
 
@@ -30,7 +30,7 @@ if __name__ == "__main__":
         "/home/da2986/tennis_tracker/GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py",
         "/home/da2986/tennis_tracker/GroundingDINO/groundingdino_swint_ogc.pth",
     )
-    model = torch.compile(model)
+    # model = torch.compile(model)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model = model.to(device)
     TEXT_PROMPT = "tennis player"
@@ -40,7 +40,7 @@ if __name__ == "__main__":
         "/home/da2986/tennis_tracker/tennis_tracker/download_data/labels.json"
     )
 
-    data = read_json(JSON_PATH)
+    data = read_json_file(JSON_PATH)
     img_paths = [img_path for img_path in data.keys()]
 
     batch_size = 10
@@ -77,7 +77,7 @@ if __name__ == "__main__":
             # now we translate to the world coords
             image_dims = data[batch_images[im_num]]['image_dims'].copy()
             m = np.array(data[batch_images[im_num]]['m'].copy())
-            transformed_points = transform_points(m, im_boxes.copy(), image_dims)
+            transformed_points = transform_points(m, im_boxes, image_dims)
             data[batch_images[im_num]]['transformed_coords'] = transformed_points
             
             
