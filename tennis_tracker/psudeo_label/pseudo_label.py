@@ -3,6 +3,7 @@ import os
 import cv2
 import numpy as np
 import torch
+from tqdm import tqdm
 from groundingdino.util.inference import (
     annotate,
     batch_predict,
@@ -26,8 +27,8 @@ def output_point(m: np.array, points: np.array) -> list:
 if __name__ == "__main__":
 
     model = load_model(
-        "GroundingDINO_SwinT_OGC.py",
-        "/Users/derek/Desktop/GroundingDINO/groundingdino_swint_ogc.pth",
+        "/home/da2986/tennis_tracker/GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py",
+        "/home/da2986/tennis_tracker/GroundingDINO/groundingdino_swint_ogc.pth",
     )
     model = torch.compile(model)
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -36,18 +37,20 @@ if __name__ == "__main__":
     BOX_TRESHOLD = 0.35
     TEXT_TRESHOLD = 0.25
     JSON_PATH = (
-        "/Users/derek/Desktop/tennis_tracker/tennis_tracker/download_data/label.json"
+        "/home/da2986/tennis_tracker/tennis_tracker/download_data/labels.json"
     )
 
     data = read_json(JSON_PATH)
     img_paths = [img_path for img_path in data.keys()]
 
     batch_size = 10
-    images = os.listdir("/Users/derek/Desktop/GroundingDINO/oct15")
-    OUTPUT_JSON_PATH = JSON_PATH
+    OUTPUT_JSON_PATH = "/home/da2986/tennis_tracker/tennis_tracker/psudeo_label/labels.json"
+    
+    if os.path.exists(OUTPUT_JSON_PATH):
+        os.remove(OUTPUT_JSON_PATH)
 
     for i in tqdm(range(0, len(img_paths), batch_size)):
-        batch_images = images[i : i + batch_size]
+        batch_images = img_paths[i : i + batch_size]
         loaded_images = []
         for image in batch_images:
             image_source, image = load_image(image)

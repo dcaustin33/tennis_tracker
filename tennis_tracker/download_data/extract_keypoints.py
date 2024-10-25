@@ -9,6 +9,7 @@ import torch
 import torch.nn.functional as F
 import torch.utils.data.dataloader
 from PIL import Image
+from tqdm import tqdm
 
 from tennis_tracker.player_location.postprocess import postprocess
 from tennis_tracker.player_location.tracknet import BallTrackerNet
@@ -98,19 +99,19 @@ def read_court_coords(file_path: str):
 
 if __name__ == "__main__":
     # ARGS
-    model_path = "/Users/derek/Desktop/tennis_tracker/tennis_tracker/player_location/model_tennis_court_det.pt"
+    model_path = "/home/da2986/tennis_tracker/tennis_tracker/player_location/model_tennis_court_det.pt"
     dataset_path = (
-        "/Users/derek/Desktop/tennis_tracker/tennis_tracker/download_data/frames"
+        "/home/da2986/tennis_tracker/tennis_tracker/download_data/frames"
     )
     json_file_path = (
-        "/Users/derek/Desktop/tennis_tracker/tennis_tracker/download_data/labels.json"
+        "/home/da2986/tennis_tracker/tennis_tracker/download_data/labels.json"
     )
-    court_coordinates_path = "/Users/derek/Desktop/tennis_tracker/tennis_tracker/player_location/padded_click_coordinates.txt"
-    batch_size = 10
+    court_coordinates_path = "/home/da2986/tennis_tracker/tennis_tracker/player_location/padded_click_coordinates.txt"
+    batch_size = 24
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     model = BallTrackerNet(out_channels=15)
-    model.load_state_dict(torch.load(model_path, map_location="mps"))
+    model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
     model = torch.compile(model)
     model = model.to(device)
@@ -130,13 +131,11 @@ if __name__ == "__main__":
     # we are also going to get the homography matrix
     court_coordinates = np.array(read_court_coords(court_coordinates_path))
 
-    for idx, batch in enumerate(dataloader):
-        if idx % 10 == 0:
-            print(idx, time.time() - time_now)
-            time_now = time.time()
+    for idx, batch in tqdm(enumerate(dataloader)):
         imgs, img_paths = batch
         imgs = imgs.to(device)
-        output = model(imgs)
+        with torch.no_grad():
+            output = model(imgs)
         preds = F.sigmoid(output).cpu().detach().numpy()
         all_preds = []
         paths = []
