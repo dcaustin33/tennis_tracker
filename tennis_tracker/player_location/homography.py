@@ -62,8 +62,11 @@ def transform_points(m: np.array, all_boxes: list, image_dims: tuple) -> list:
     image_dims[1] *= 2
     all_points = []
     for box in all_boxes:
-        cx, cy, h, w = box.cpu()
-        ankles_point = [cx+w/2, cy+h/2]
+        if type(box) == torch.Tensor:
+            cx, cy, w, h = box.cpu()
+        else:
+            cx, cy, w, h = box
+        ankles_point = [cx, cy+h/2]
         ankles_point[0] *= image_dims[0]
         ankles_point[1] *= image_dims[1]
         all_points.append(ankles_point)
