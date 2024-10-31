@@ -73,6 +73,17 @@ if __name__ == "__main__":
             all_boxes = []
             if len(im_boxes) > 0:
                 for box in im_boxes:
+                    if im_num % 4 == 0:
+                        pass
+                    elif im_num % 4 == 1:
+                        box[0] += 0.5
+                    elif im_num % 4 == 2:
+                        box[1] += 0.5
+                    elif im_num % 4 == 3:
+                        box[0] += 0.5
+                        box[1] += 0.5
+                    box[2] *= 0.5
+                    box[3] *= 0.5
                     all_boxes.append(f"0 {box[0]} {box[1]} {box[2]} {box[3]}")
                 data[batch_images[im_num]]['ball_tracking_boxes'] = all_boxes
                 lines.append(all_boxes)
