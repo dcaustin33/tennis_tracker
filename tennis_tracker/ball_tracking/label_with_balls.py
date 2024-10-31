@@ -34,11 +34,11 @@ if __name__ == "__main__":
     # model = torch.compile(model)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model = model.to(device)
-    TEXT_PROMPT = "yellow tennis ball"
+    TEXT_PROMPT = "tennis ball"
     BOX_TRESHOLD = 0.35
     TEXT_TRESHOLD = 0.25
     JSON_PATH = (
-        "/home/da2986/tennis_tracker/tennis_tracker/psudeo_label/clean_labels.json"
+        "/home/da2986/tennis_tracker/tennis_tracker/pseudo_label/clean_labels.json"
     )
 
     data = read_json_file(JSON_PATH)
@@ -71,16 +71,20 @@ if __name__ == "__main__":
             # get all the boxes that correspond to this image
             im_boxes = boxes[torch.Tensor(boxes_to_im) == im_num]
             all_boxes = []
-            for box in im_boxes:
-                all_boxes.append(f"0 {box[0]} {box[1]} {box[2]} {box[3]}")
-            data[batch_images[im_num]]['ball_tracking_boxes'] = all_boxes
-            lines.append(all_boxes)
-            
-            # now we translate to the world coords
-            image_dims = data[batch_images[im_num]]['image_dims'].copy()
-            m = np.array(data[batch_images[im_num]]['m'].copy())
-            transformed_points = transform_points(m, im_boxes, image_dims)
-            data[batch_images[im_num]]['ball_tracking_transformed_coords'] = transformed_points
+            if len(im_boxes) > 0:
+                for box in im_boxes:
+                    all_boxes.append(f"0 {box[0]} {box[1]} {box[2]} {box[3]}")
+                data[batch_images[im_num]]['ball_tracking_boxes'] = all_boxes
+                lines.append(all_boxes)
+                
+                # now we translate to the world coords
+                image_dims = data[batch_images[im_num]]['image_dims'].copy()
+                m = np.array(data[batch_images[im_num]]['m'].copy())
+                transformed_points = transform_points(m, im_boxes, image_dims)
+                data[batch_images[im_num]]['ball_tracking_transformed_coords'] = transformed_points
+            else:
+                data[batch_images[im_num]]['ball_tracking_boxes'] = []
+                data[batch_images[im_num]]['ball_tracking_transformed_coords'] = []
             
             
     write_to_json_file(OUTPUT_JSON_PATH, data)
