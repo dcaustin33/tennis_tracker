@@ -3,7 +3,7 @@ import os
 import cv2
 import numpy as np
 import torch
-from groundingdino.util.inference import batch_predict, load_image, load_model
+from groundingdino.util.inference import batch_predict, load_image_quarters, load_model
 from tqdm import tqdm
 
 from tennis_tracker.download_data.extract_keypoints import (
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     data = read_json_file(JSON_PATH)
     img_paths = [img_path for img_path in data.keys()]
 
-    batch_size = 10
+    batch_size = 3
     OUTPUT_JSON_PATH = "/home/da2986/tennis_tracker/tennis_tracker/ball_tracking/labels.json"
     
     if os.path.exists(OUTPUT_JSON_PATH):
@@ -53,10 +53,11 @@ if __name__ == "__main__":
     for i in tqdm(range(0, len(img_paths), batch_size)):
         batch_images = img_paths[i : i + batch_size]
         loaded_images = []
+        image_paths = []
         for image in batch_images:
-            image_source, image = load_image(image)
-            quarters = cut_image_into_quarters(image)
-            loaded_images.extend(quarters)
+            image_paths.extend([image] * 4)
+            image_source, image = load_image_quarters(image)
+            loaded_images.extend(image)
         input_images = torch.stack(loaded_images)
         boxes, logits, boxes_to_im = batch_predict(
             model=model,
@@ -67,12 +68,22 @@ if __name__ == "__main__":
             device=device,
         )
         lines = []
-        for im_num in range(len(batch_images)):
+        final_boxes = []
+        all_im_boxes = []
+        previous_path = ""
+        for im_num in range(len(batch_images) * 4):
             # get all the boxes that correspond to this image
             im_boxes = boxes[torch.Tensor(boxes_to_im) == im_num]
-            all_boxes = []
+            if previous_path != image_paths[im_num]:
+                all_boxes = []
+                all_im_boxes = []
+                previous_path = image_paths[im_num]
             if len(im_boxes) > 0:
                 for box in im_boxes:
+                    box[0] *= 0.5
+                    box[1] *= 0.5
+                    box[2] *= 0.5
+                    box[3] *= 0.5
                     if im_num % 4 == 0:
                         pass
                     elif im_num % 4 == 1:
@@ -82,20 +93,18 @@ if __name__ == "__main__":
                     elif im_num % 4 == 3:
                         box[0] += 0.5
                         box[1] += 0.5
-                    box[2] *= 0.5
-                    box[3] *= 0.5
                     all_boxes.append(f"0 {box[0]} {box[1]} {box[2]} {box[3]}")
-                data[batch_images[im_num]]['ball_tracking_boxes'] = all_boxes
-                lines.append(all_boxes)
+                    all_im_boxes.append(box)
                 
                 # now we translate to the world coords
-                image_dims = data[batch_images[im_num]]['image_dims'].copy()
-                m = np.array(data[batch_images[im_num]]['m'].copy())
-                transformed_points = transform_points(m, im_boxes, image_dims)
-                data[batch_images[im_num]]['ball_tracking_transformed_coords'] = transformed_points
-            else:
-                data[batch_images[im_num]]['ball_tracking_boxes'] = []
-                data[batch_images[im_num]]['ball_tracking_transformed_coords'] = []
+                image_dims = data[image_paths[im_num]]['image_dims'].copy()
+                m = np.array(data[image_paths[im_num]]['m'].copy())
+                transformed_points = transform_points(m, all_im_boxes, image_dims)
+                data[image_paths[im_num]]['ball_tracking_boxes'] = all_boxes
+                data[image_paths[im_num]]['ball_tracking_transformed_coords'] = transformed_points
+            elif im_num % 4 == 3 and len(all_im_boxes) > 0:
+                data[image_paths[im_num]]['ball_tracking_boxes'] = []
+                data[image_paths[im_num]]['ball_tracking_transformed_coords'] = []
             
             
     write_to_json_file(OUTPUT_JSON_PATH, data)
