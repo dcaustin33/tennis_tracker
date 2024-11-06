@@ -96,24 +96,38 @@ def read_court_coords(file_path: str):
     lines = [line.strip().split(",") for line in lines]
     return [[int(x), int(y)] for x, y in lines]
 
+def get_visible_points(points: list, source_points: list) -> list:
+    visible_points = []
+    visible_source_points = []
+    for point, source_point in zip(points, source_points):
+        if point != (None, None):
+            visible_points.append(point)
+            visible_source_points.append(source_point)
+    return visible_points, visible_source_points
+
 
 if __name__ == "__main__":
     # ARGS
-    model_path = "/home/da2986/tennis_tracker/tennis_tracker/player_location/model_tennis_court_det.pt"
+    # model_path = "/home/da2986/tennis_tracker/tennis_tracker/player_location/model_tennis_court_det.pt"
+    model_path = "/Users/derek/Desktop/tennis_tracker/tennis_tracker/player_location/model_tennis_court_det.pt"
     dataset_path = (
-        "/home/da2986/tennis_tracker/tennis_tracker/download_data/frames"
+        # "/home/da2986/tennis_tracker/tennis_tracker/download_data/frames"
+        "/Users/derek/Desktop/tennis_tracker/tennis_tracker/download_data/frames2/V01"
     )
     json_file_path = (
-        "/home/da2986/tennis_tracker/tennis_tracker/download_data/labels.json"
+        # "/home/da2986/tennis_tracker/tennis_tracker/download_data/labels.json"
+        "/Users/derek/Desktop/tennis_tracker/tennis_tracker/download_data/labels_V010.json"
     )
-    court_coordinates_path = "/home/da2986/tennis_tracker/tennis_tracker/player_location/padded_click_coordinates.txt"
+    # court_coordinates_path = "/home/da2986/tennis_tracker/tennis_tracker/player_location/padded_click_coordinates.txt"
+    court_coordinates_path = "/Users/derek/Desktop/tennis_tracker/tennis_tracker/player_location/padded_click_coordinates.txt"
     batch_size = 24
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    # device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = "mps"
 
     model = BallTrackerNet(out_channels=15)
-    model.load_state_dict(torch.load(model_path, map_location=device))
+    model.load_state_dict(torch.load(model_path, map_location="cpu"))
     model.eval()
-    model = torch.compile(model)
+    # model = torch.compile(model)
     model = model.to(device)
 
     dataset = frame_dataset(dataset_path)
@@ -152,11 +166,17 @@ if __name__ == "__main__":
             # if the tracknet produces None means it is not visible / not there
             # we are using this as our filtering criteria so we only capture good points
             if (None, None) in points:
-                continue
-            m, _ = cv2.findHomography(np.array(points), court_coordinates)
+                # check to see if at least 10 are visible
+                if len([p for p in points if p != (None, None)]) <= 10:
+                    continue
+                points, visible_court_coords = get_visible_points(points, court_coordinates)
+            
+                m, _ = cv2.findHomography(np.array(points), np.array(visible_court_coords))
+            else:
+                m, _ = cv2.findHomography(np.array(points), court_coordinates)
             lines[img_paths[pred_idx]] = {
                 "keypoints": [[int(point[0]), int(point[1])] for point in points],
-                "image_dims": imgs[pred_idx].shape[-2:],
+                "image_dims": imgs[pred_idx].shape[-2:][::-1],
                 "m": m.tolist(),
             }
         # if len(lines) > 100:
