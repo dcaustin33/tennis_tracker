@@ -16,6 +16,7 @@ matplotlib = "^3.9.2"
 tqdm = "^4.66.5"
 setuptools = "^75.2.0"
 torchvision = "0.18.1"
+object-tracking = {git = "https://github.com/dcaustin33/object_tracking.git"}
 
 
 [tool.poetry.group.dev.dependencies]

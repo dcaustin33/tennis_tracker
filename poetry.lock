@@ -1420,6 +1420,27 @@ files = [
 ]
 
 [[package]]
+name = "object-tracking"
+version = "0.1.0"
+description = ""
+optional = false
+python-versions = "^3.10"
+files = []
+develop = false
+
+[package.dependencies]
+ipykernel = "^6.29.5"
+matplotlib = "^3.9.2"
+numpy = "^2.1.2"
+scipy = "^1.14.1"
+
+[package.source]
+type = "git"
+url = "https://github.com/dcaustin33/object_tracking.git"
+reference = "HEAD"
+resolved_reference = "76f461831da8204f4f43c15130c69ec21bd94cbe"
+
+[[package]]
 name = "opencv-python"
 version = "4.10.0.84"
 description = "Wrapper package for OpenCV python bindings."
@@ -2390,4 +2411,4 @@ test = ["pytest (>=8.1,<9.0)", "pytest-rerunfailures (>=14.0,<15.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "8e4c07c602ca49497a88c78bf2f3d56433afae7c32f2e2c090edd8e5b60b98f1"
+content-hash = "4d4b14f9ed9c9ef4c0755847b17b9575d5143265a31512858ea370d274176c04"

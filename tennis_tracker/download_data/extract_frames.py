@@ -17,4 +17,5 @@ if __name__ == "__main__":
         fps = video.get(cv2.CAP_PROP_FPS)
 
         print(video_path)
-        os.system(f"ffmpeg -i '{video_path}' -vf fps={fps} '{new_output_path}/%d.png'")
+        # Extract frames from 10min to 30min (600s to 1800s)
+        os.system(f"ffmpeg -i '{video_path}' -ss 600 -t 1200 -vf fps={fps} '{new_output_path}/%d.png'")

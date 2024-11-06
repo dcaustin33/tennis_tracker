@@ -46,7 +46,7 @@ def associate_coordinates(
     """
     if len(tracked_points) == 0:
         return {0: None, 1: None}
-    
+
     distance = []
     for tracker in [tracker_player1, tracker_player2]:
         tracker_distances = []
@@ -61,13 +61,13 @@ def associate_coordinates(
     min_idx_player2 = np.argmin(distance[1])
 
     # If both trackers prefer the same point, assign it to the closer tracker
-    
+
     if len(tracked_points) == 1:
         if distance[0][0] <= distance[1][0]:
             return {0: tracked_points[0], 1: None}
         else:
             return {0: None, 1: tracked_points[0]}
-    
+
     if min_idx_player1 == min_idx_player2:
         if distance[0][min_idx_player1] <= distance[1][min_idx_player2]:
             # Point goes to player 1, player 2 gets the other point
@@ -101,7 +101,7 @@ if __name__ == "__main__":
     FPS = video_capture.get(cv2.CAP_PROP_FPS)
 
     output_video = cv2.VideoWriter(
-        "tennis_tracking_output.mp4",
+        "tennis_tracking_kalman_output.mp4",
         cv2.VideoWriter_fourcc(*"XVID"),
         FPS,
         (FRAME_WIDTH + COURT_WIDTH, max(FRAME_HEIGHT, COURT_HEIGHT)),
