@@ -2,6 +2,8 @@ import os
 
 import cv2
 
+# good serena points 31:08 - 31:30
+
 if __name__ == "__main__":
     path_to_videos = (
         "/home/da2986/tennis_tracker/tennis_tracker/download_data/dataset"
