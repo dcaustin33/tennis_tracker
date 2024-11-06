@@ -2,6 +2,7 @@
 *.venv
 *.webm
 **/frames
+**/frames2
 **/__pycache__
 **/GroundingDINO
 *.mp4
