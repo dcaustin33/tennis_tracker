@@ -108,21 +108,21 @@ def get_visible_points(points: list, source_points: list) -> list:
 
 if __name__ == "__main__":
     # ARGS
-    # model_path = "/home/da2986/tennis_tracker/tennis_tracker/player_location/model_tennis_court_det.pt"
-    model_path = "/Users/derek/Desktop/tennis_tracker/tennis_tracker/player_location/model_tennis_court_det.pt"
+    model_path = "/home/da2986/tennis_tracker/tennis_tracker/player_location/model_tennis_court_det.pt"
+    # model_path = "/Users/derek/Desktop/tennis_tracker/tennis_tracker/player_location/model_tennis_court_det.pt"
     dataset_path = (
-        # "/home/da2986/tennis_tracker/tennis_tracker/download_data/frames"
-        "/Users/derek/Desktop/tennis_tracker/tennis_tracker/download_data/frames2/V01"
+        "/home/da2986/tennis_tracker/tennis_tracker/download_data/frames2/V01"
+        # "/Users/derek/Desktop/tennis_tracker/tennis_tracker/download_data/frames2/V010"
     )
     json_file_path = (
-        # "/home/da2986/tennis_tracker/tennis_tracker/download_data/labels.json"
-        "/Users/derek/Desktop/tennis_tracker/tennis_tracker/download_data/labels_V010.json"
+        "/home/da2986/tennis_tracker/tennis_tracker/download_data/labels_V010.json"
+        # "/Users/derek/Desktop/tennis_tracker/tennis_tracker/download_data/labels_V010.json"
     )
-    # court_coordinates_path = "/home/da2986/tennis_tracker/tennis_tracker/player_location/padded_click_coordinates.txt"
-    court_coordinates_path = "/Users/derek/Desktop/tennis_tracker/tennis_tracker/player_location/padded_click_coordinates.txt"
+    court_coordinates_path = "/home/da2986/tennis_tracker/tennis_tracker/player_location/padded_click_coordinates.txt"
+    # court_coordinates_path = "/Users/derek/Desktop/tennis_tracker/tennis_tracker/player_location/padded_click_coordinates.txt"
     batch_size = 24
-    # device = "cuda" if torch.cuda.is_available() else "cpu"
-    device = "mps"
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    # device = "mps"
 
     model = BallTrackerNet(out_channels=15)
     model.load_state_dict(torch.load(model_path, map_location="cpu"))

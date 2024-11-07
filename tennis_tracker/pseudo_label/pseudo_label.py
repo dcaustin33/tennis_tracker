@@ -32,14 +32,15 @@ if __name__ == "__main__":
     BOX_TRESHOLD = 0.35
     TEXT_TRESHOLD = 0.25
     JSON_PATH = (
-        "/home/da2986/tennis_tracker/tennis_tracker/download_data/labels.json"
+        # "/home/da2986/tennis_tracker/tennis_tracker/download_data/labels.json"
+        "/home/da2986/tennis_tracker/tennis_tracker/download_data/labels_V010.json"
     )
 
     data = read_json_file(JSON_PATH)
     img_paths = [img_path for img_path in data.keys()]
 
     batch_size = 10
-    OUTPUT_JSON_PATH = "/home/da2986/tennis_tracker/tennis_tracker/psudeo_label/labels.json"
+    OUTPUT_JSON_PATH = "/home/da2986/tennis_tracker/tennis_tracker/pseudo_label/labels_V010.json"
     
     if os.path.exists(OUTPUT_JSON_PATH):
         os.remove(OUTPUT_JSON_PATH)
