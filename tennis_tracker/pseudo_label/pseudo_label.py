@@ -64,8 +64,11 @@ if __name__ == "__main__":
         for im_num in range(len(batch_images)):
             # get all the boxes that correspond to this image
             im_boxes = boxes[torch.Tensor(boxes_to_im) == im_num]
+            logits = logits[torch.Tensor(boxes_to_im) == im_num]
+            # sort the boxes by logits
+            sorted_boxes = im_boxes[logits.argsort()]
             all_boxes = []
-            for box in im_boxes:
+            for box in sorted_boxes[:3]:
                 all_boxes.append(f"0 {box[0]} {box[1]} {box[2]} {box[3]}")
             data[batch_images[im_num]]['boxes'] = all_boxes
             lines.append(all_boxes)

@@ -1438,7 +1438,7 @@ scipy = "^1.14.1"
 type = "git"
 url = "https://github.com/dcaustin33/object_tracking.git"
 reference = "HEAD"
-resolved_reference = "76f461831da8204f4f43c15130c69ec21bd94cbe"
+resolved_reference = "399d223e006b1558719a417b2b274599c3d01df6"
 
 [[package]]
 name = "opencv-python"

@@ -100,27 +100,33 @@ def get_visible_points(points: list, source_points: list) -> list:
     visible_points = []
     visible_source_points = []
     for point, source_point in zip(points, source_points):
+        print(point, source_point)
         if point != (None, None):
             visible_points.append(point)
             visible_source_points.append(source_point)
+    print("*"*100)
+    for point1, point2 in zip(visible_points, visible_source_points):
+        print(point1, point2)
+    import pdb; pdb.set_trace()
     return visible_points, visible_source_points
 
 
 if __name__ == "__main__":
     # ARGS
     model_path = "/home/da2986/tennis_tracker/tennis_tracker/player_location/model_tennis_court_det.pt"
-    # model_path = "/Users/derek/Desktop/tennis_tracker/tennis_tracker/player_location/model_tennis_court_det.pt"
+    model_path = "/Users/derek/Desktop/tennis_tracker/tennis_tracker/player_location/model_tennis_court_det.pt"
     dataset_path = (
-        "/home/da2986/tennis_tracker/tennis_tracker/download_data/frames2/V01"
-        # "/Users/derek/Desktop/tennis_tracker/tennis_tracker/download_data/frames2/V010"
+        # "/home/da2986/tennis_tracker/tennis_tracker/download_data/frames2/V01"
+        "/Users/derek/Desktop/tennis_tracker/tennis_tracker/download_data/frames2/V01"
     )
     json_file_path = (
-        "/home/da2986/tennis_tracker/tennis_tracker/download_data/labels_V010.json"
-        # "/Users/derek/Desktop/tennis_tracker/tennis_tracker/download_data/labels_V010.json"
+        # "/home/da2986/tennis_tracker/tennis_tracker/download_data/labels_V010.json"
+        "/Users/derek/Desktop/tennis_tracker/tennis_tracker/download_data/labels_V010.json"
     )
-    court_coordinates_path = "/home/da2986/tennis_tracker/tennis_tracker/player_location/padded_click_coordinates.txt"
-    # court_coordinates_path = "/Users/derek/Desktop/tennis_tracker/tennis_tracker/player_location/padded_click_coordinates.txt"
-    batch_size = 24
+    # court_coordinates_path = "/home/da2986/tennis_tracker/tennis_tracker/player_location/padded_click_coordinates.txt"
+    court_coordinates_path = "/Users/derek/Desktop/tennis_tracker/tennis_tracker/player_location/padded_click_coordinates.txt"
+    # batch_size = 24
+    batch_size = 2
     device = "cuda" if torch.cuda.is_available() else "cpu"
     # device = "mps"
 
@@ -179,6 +185,6 @@ if __name__ == "__main__":
                 "image_dims": imgs[pred_idx].shape[-2:][::-1],
                 "m": m.tolist(),
             }
-        # if len(lines) > 100:
         write_to_json_file(json_file_path, lines)
         lines = {}
+        break

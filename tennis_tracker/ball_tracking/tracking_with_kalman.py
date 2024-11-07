@@ -340,45 +340,6 @@ if __name__ == "__main__":
 
         current_objects.extend(new_objects)
 
-        # if len(current_objects) > 0:
-        #     for obj in current_objects:
-        #         frame = plot_frame(frame, [obj])
-        #     frame = plot_detected_objects(frame, measurements)
-
-        #     # Add ticks showing resolution
-        #     height, width = frame.shape[:2]
-        #     tick_spacing = 100  # Show ticks every 100 pixels
-
-        #     # Add horizontal ticks and labels
-        #     for x in range(0, width, tick_spacing):
-        #         cv2.line(frame, (x, height - 20), (x, height - 10), (255, 255, 255), 1)
-        #         cv2.putText(
-        #             frame,
-        #             str(x),
-        #             (x - 10, height - 5),
-        #             cv2.FONT_HERSHEY_SIMPLEX,
-        #             0.4,
-        #             (255, 255, 255),
-        #             1,
-        #         )
-
-        #     # Add vertical ticks and labels
-
-        #     for y in range(0, height, tick_spacing):
-        #         cv2.line(frame, (10, y), (20, y), (255, 255, 255), 1)
-        #         cv2.putText(
-        #             frame,
-        #             str(y),
-        #             (25, y + 4),
-        #             cv2.FONT_HERSHEY_SIMPLEX,
-        #             0.4,
-        #             (255, 255, 255),
-        #             1,
-        #         )
-
-        #     cv2.imshow("Tennis Tracking", frame)
-        #     cv2.waitKey(int(1000 / FPS))
-
         if len(current_objects) > 1:
             selected_object = select_ball_object(current_objects)
             frame = plot_frame(frame, selected_object)
