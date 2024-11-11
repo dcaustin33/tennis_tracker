@@ -20,7 +20,6 @@ def get_next_frame(data_entry: dict, court_image: np.array):
     tracked_points = data_entry["transformed_coords"]
     original_image = cv2.imread(data_entry["actual_path"])
     original_image = cv2.resize(original_image, (640, 480))
-    import pdb; pdb.set_trace()
     for point in tracked_points:
         cv2.circle(court_image, [int(p) for p in point], 10, (0, 0, 255), -1)
     return original_image, tracked_points
