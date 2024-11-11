@@ -97,6 +97,7 @@ def read_court_coords(file_path: str):
     lines = [line.strip().split(",") for line in lines]
     return [[int(x), int(y)] for x, y in lines]
 
+
 def get_visible_points(points: list, source_points: list) -> list:
     visible_points = []
     visible_source_points = []
@@ -107,14 +108,23 @@ def get_visible_points(points: list, source_points: list) -> list:
             visible_source_points.append(source_point)
     return visible_points, visible_source_points
 
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_path", type=str, default="./model_tennis_court_det.pt")
-    parser.add_argument("--dataset_path", type=str, default="../download_data/frames/serena_v_azarenka")
-    parser.add_argument("--output_json_path", type=str, default="./labels_V010_v3.json")
-    parser.add_argument("--court_coordinates_path", type=str, default="./padded_click_coordinates.txt")
+    parser.add_argument(
+        "--dataset_path", type=str, default="../download_data/frames/serena_v_azarenka"
+    )
+    parser.add_argument(
+        "--output_json_path", type=str, default="../labels/labels_V010.json"
+    )
+    parser.add_argument(
+        "--court_coordinates_path", type=str, default="./padded_click_coordinates.txt"
+    )
     parser.add_argument("--batch_size", type=int, default=24)
-    parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument(
+        "--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu"
+    )
     return parser.parse_args()
 
 
@@ -167,15 +177,19 @@ if __name__ == "__main__":
                 points.append((x_pred, y_pred))
 
             # if the tracknet produces None means it is not visible / not there
-            # we are using this as our filtering criteria so we only capture frames with 
+            # we are using this as our filtering criteria so we only capture frames with
             # points present
             if (None, None) in points:
                 # check to see if at least 10 are visible
                 if len([p for p in points if p != (None, None)]) <= 10:
                     continue
-                points, visible_court_coords = get_visible_points(points, court_coordinates)
-            
-                m, _ = cv2.findHomography(np.array(points), np.array(visible_court_coords))
+                points, visible_court_coords = get_visible_points(
+                    points, court_coordinates
+                )
+
+                m, _ = cv2.findHomography(
+                    np.array(points), np.array(visible_court_coords)
+                )
             else:
                 m, _ = cv2.findHomography(np.array(points), court_coordinates)
             lines[img_paths[pred_idx]] = {

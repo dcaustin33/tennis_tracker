@@ -17,4 +17,8 @@ TODO
 
 1. Download the data. Navigate to the download_data directory run `python download_any_video.py`. Then to extract the frames run `python extract_frames.py`. This should extract frames for the point shown in the video to the `frames` directory.
 
-2. 
+2. Extract the court keypoints. We need to extract court keypoints in order to get the homography matrix. Navigate to the player_location directory and run `python extract_keypoints.py`. This should create a labels.json file in the labels directory.
+
+3. Get bounding boxes for the players. Navigate to the player_tracking directory and run `python label_players.py`. This should create a labels.json file in the labels directory with all of the information from step 2 with additional bounding boxes, homography matrices, and ankle keypoint coordinates in the world coordinate system.
+
+4. Visualize player tracking. Navigate to the visualize directory and run `python visualize_player_tracking.py`. This should create a video in the visualize directory with the player tracking both on the real image, the homography transformed image, and with both combined into one video.
