@@ -3,4 +3,3 @@ cd ../..;
 git add .;
 git commit -m "pseudo label";
 git push;
-sudo shutdown;
