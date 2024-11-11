@@ -33,7 +33,7 @@ if __name__ == "__main__":
     TEXT_TRESHOLD = 0.25
     JSON_PATH = (
         # "/home/da2986/tennis_tracker/tennis_tracker/download_data/labels.json"
-        "/home/da2986/tennis_tracker/tennis_tracker/download_data/labels_V010.json"
+        "/home/da2986/tennis_tracker/tennis_tracker/ball_tracking/clean_labels_V010_v2.json"
     )
 
     data = read_json_file(JSON_PATH)
@@ -64,9 +64,9 @@ if __name__ == "__main__":
         for im_num in range(len(batch_images)):
             # get all the boxes that correspond to this image
             im_boxes = boxes[torch.Tensor(boxes_to_im) == im_num]
-            logits = logits[torch.Tensor(boxes_to_im) == im_num]
+            current_logits = logits[torch.Tensor(boxes_to_im) == im_num]
             # sort the boxes by logits
-            sorted_boxes = im_boxes[logits.argsort()]
+            sorted_boxes = im_boxes[current_logits.argsort(descending=True)]
             all_boxes = []
             for box in sorted_boxes[:3]:
                 all_boxes.append(f"0 {box[0]} {box[1]} {box[2]} {box[3]}")
