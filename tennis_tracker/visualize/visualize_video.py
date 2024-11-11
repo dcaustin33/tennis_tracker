@@ -5,7 +5,7 @@ from tqdm import tqdm
 from tennis_tracker.download_data.extract_keypoints import read_json_file
 
 FILE_PATH = (
-    "/Users/derek/Desktop/tennis_tracker/tennis_tracker/ball_tracking/clean_labels_V010_v2.json"
+    "/Users/derek/Desktop/tennis_tracker/tennis_tracker/pseudo_label/labels_V010.json"
 )
 FPS = 30
 FRAME_WIDTH, FRAME_HEIGHT = 640, 480
@@ -20,6 +20,7 @@ def get_next_frame(data_entry: dict, court_image: np.array):
     tracked_points = data_entry["transformed_coords"]
     original_image = cv2.imread(data_entry["actual_path"])
     original_image = cv2.resize(original_image, (640, 480))
+    import pdb; pdb.set_trace()
     for point in tracked_points:
         cv2.circle(court_image, [int(p) for p in point], 10, (0, 0, 255), -1)
     return original_image, tracked_points
@@ -57,5 +58,6 @@ if __name__ == "__main__":
         frame[:COURT_HEIGHT, FRAME_WIDTH:FRAME_WIDTH + COURT_WIDTH, :] = court_image
         output_video.write(frame)
         cv2.imshow("Tennis Tracking", frame)
+        
         if cv2.waitKey(int(1000 / FPS)) & 0xFF == ord("q"):
             break

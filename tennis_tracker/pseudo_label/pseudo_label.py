@@ -76,7 +76,7 @@ if __name__ == "__main__":
             # now we translate to the world coords
             image_dims = data[batch_images[im_num]]['image_dims'].copy()
             m = np.array(data[batch_images[im_num]]['m'].copy())
-            transformed_points = transform_points(m, im_boxes, image_dims)
+            transformed_points = transform_points(m, sorted_boxes[:3], image_dims)
             data[batch_images[im_num]]['transformed_coords'] = transformed_points
             
             
