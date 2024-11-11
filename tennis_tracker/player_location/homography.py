@@ -74,10 +74,3 @@ def transform_points(m: np.array, all_boxes: list, image_dims: tuple) -> list:
 
     output = cv2.perspectiveTransform(points, m)
     return output.reshape(-1, 2).tolist()
-    
-    
-
-
-if __name__ == "__main__":
-    # could do with a dataloader once we have enough data
-    pass

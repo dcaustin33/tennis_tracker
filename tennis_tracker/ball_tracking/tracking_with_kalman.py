@@ -8,7 +8,7 @@ from object_tracking.kalman_filter.schema_n_adaptive_q import (
 )
 from tqdm import tqdm
 
-from tennis_tracker.download_data.extract_keypoints import read_json_file
+from tennis_tracker.player_location.extract_keypoints import read_json_file
 
 STATE = KalmanStateVectorNDAdaptiveQ
 TRACKER = KalmanNDTrackerAdaptiveQ

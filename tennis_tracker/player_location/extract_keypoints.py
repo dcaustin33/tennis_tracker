@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 import pathlib
@@ -100,60 +101,56 @@ def get_visible_points(points: list, source_points: list) -> list:
     visible_points = []
     visible_source_points = []
     for point, source_point in zip(points, source_points):
-        print(point, source_point)
+
         if point != (None, None):
             visible_points.append(point)
             visible_source_points.append(source_point)
-    print("*"*100)
-    for point1, point2 in zip(visible_points, visible_source_points):
-        print(point1, point2)
-    import pdb; pdb.set_trace()
     return visible_points, visible_source_points
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model_path", type=str, default="./model_tennis_court_det.pt")
+    parser.add_argument("--dataset_path", type=str, default="../download_data/frames/serena_v_azarenka")
+    parser.add_argument("--output_json_path", type=str, default="./labels_V010_v3.json")
+    parser.add_argument("--court_coordinates_path", type=str, default="./padded_click_coordinates.txt")
+    parser.add_argument("--batch_size", type=int, default=24)
+    parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
+    return parser.parse_args()
 
 
 if __name__ == "__main__":
     # ARGS
-    model_path = "/home/da2986/tennis_tracker/tennis_tracker/player_location/model_tennis_court_det.pt"
-    model_path = "/Users/derek/Desktop/tennis_tracker/tennis_tracker/player_location/model_tennis_court_det.pt"
-    dataset_path = (
-        # "/home/da2986/tennis_tracker/tennis_tracker/download_data/frames2/V01"
-        "/Users/derek/Desktop/tennis_tracker/tennis_tracker/download_data/frames2/V01"
-    )
-    json_file_path = (
-        # "/home/da2986/tennis_tracker/tennis_tracker/download_data/labels_V010.json"
-        "/Users/derek/Desktop/tennis_tracker/tennis_tracker/download_data/labels_V010.json"
-    )
-    # court_coordinates_path = "/home/da2986/tennis_tracker/tennis_tracker/player_location/padded_click_coordinates.txt"
-    court_coordinates_path = "/Users/derek/Desktop/tennis_tracker/tennis_tracker/player_location/padded_click_coordinates.txt"
-    # batch_size = 24
-    batch_size = 2
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    # device = "mps"
+    args = parse_args()
+    MODEL_PATH = args.model_path
+    DATASET_PATH = args.dataset_path
+    OUTPUT_JSON_PATH = args.output_json_path
+    COURT_COORDINATES_PATH = args.court_coordinates_path
+    BATCH_SIZE = args.batch_size
+    DEVICE = args.device
 
     model = BallTrackerNet(out_channels=15)
-    model.load_state_dict(torch.load(model_path, map_location="cpu"))
+    model.load_state_dict(torch.load(MODEL_PATH, map_location="cpu"))
     model.eval()
-    # model = torch.compile(model)
-    model = model.to(device)
+    model = model.to(DEVICE)
 
-    dataset = frame_dataset(dataset_path)
+    dataset = frame_dataset(DATASET_PATH)
     dataloader = torch.utils.data.DataLoader(
-        dataset=dataset, batch_size=batch_size, shuffle=False, num_workers=6
+        dataset=dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6
     )
-    print(f"The dataloader will have {len(dataset) / batch_size} steps")
+    print(f"The dataloader will have {len(dataset) / BATCH_SIZE} steps")
     lines = []
     lines = {}
 
-    if os.path.exists(json_file_path):
-        os.remove(json_file_path)
+    if os.path.exists(OUTPUT_JSON_PATH):
+        os.remove(OUTPUT_JSON_PATH)
 
     time_now = time.time()
-    # we are also going to get the homography matrix
-    court_coordinates = np.array(read_court_coords(court_coordinates_path))
+    # we are also going to get the homography matrix for each frame
+    court_coordinates = np.array(read_court_coords(COURT_COORDINATES_PATH))
 
     for idx, batch in tqdm(enumerate(dataloader)):
         imgs, img_paths = batch
-        imgs = imgs.to(device)
+        imgs = imgs.to(DEVICE)
         with torch.no_grad():
             output = model(imgs)
         preds = F.sigmoid(output).cpu().detach().numpy()
@@ -170,7 +167,8 @@ if __name__ == "__main__":
                 points.append((x_pred, y_pred))
 
             # if the tracknet produces None means it is not visible / not there
-            # we are using this as our filtering criteria so we only capture good points
+            # we are using this as our filtering criteria so we only capture frames with 
+            # points present
             if (None, None) in points:
                 # check to see if at least 10 are visible
                 if len([p for p in points if p != (None, None)]) <= 10:
@@ -185,6 +183,5 @@ if __name__ == "__main__":
                 "image_dims": imgs[pred_idx].shape[-2:][::-1],
                 "m": m.tolist(),
             }
-        write_to_json_file(json_file_path, lines)
+        write_to_json_file(OUTPUT_JSON_PATH, lines)
         lines = {}
-        break

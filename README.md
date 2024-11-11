@@ -11,3 +11,10 @@ psudeo_label/pseudo_label.py
 
 TODO
 - Add ball tracking
+
+
+# Workflow
+
+1. Download the data. Navigate to the download_data directory run `python download_any_video.py`. Then to extract the frames run `python extract_frames.py`. This should extract frames for the point shown in the video to the `frames` directory.
+
+2. 

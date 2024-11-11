@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 
-from tennis_tracker.download_data.extract_keypoints import (
+from tennis_tracker.player_location.extract_keypoints import (
     read_json_file,
     write_to_json_file,
 )

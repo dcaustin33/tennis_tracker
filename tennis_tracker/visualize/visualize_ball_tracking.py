@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 
-from tennis_tracker.download_data.extract_keypoints import read_json_file
+from tennis_tracker.player_location.extract_keypoints import read_json_file
 
 FILE_PATH = (
     "/Users/derek/Desktop/tennis_tracker/tennis_tracker/ball_tracking/labels.json"
