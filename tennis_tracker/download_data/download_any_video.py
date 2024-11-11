@@ -8,7 +8,7 @@ def read_paths(file_path: str):
 
 def download_video(url: str, output_path: str):
     
-    command = f"wget -O {output_path} {url}"
+    command = f'wget -O {output_path} "{url}"'
     os.system(command)
 
 
@@ -22,4 +22,3 @@ if __name__ == "__main__":
 
     for line in lines:
         download_video(line, f"{DATASET_PATH}/serena_v_azarenka.mp4")
-    

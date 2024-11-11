@@ -116,7 +116,7 @@ def parse_args():
         "--dataset_path", type=str, default="../download_data/frames/serena_v_azarenka"
     )
     parser.add_argument(
-        "--output_json_path", type=str, default="../labels/labels_V010.json"
+        "--output_json_path", type=str, default="../labels/labels.json"
     )
     parser.add_argument(
         "--court_coordinates_path", type=str, default="./padded_click_coordinates.txt"
