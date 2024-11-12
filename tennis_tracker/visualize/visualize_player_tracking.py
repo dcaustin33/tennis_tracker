@@ -54,9 +54,9 @@ def extract_measurement(
     return measurements
 
 
-def process_frame(data_entry: dict) -> tuple[np.array, list[np.array]]:
+def process_frame(data_entry: dict, key: str) -> tuple[np.array, list[np.array]]:
     """Process a single frame of data - gets out the frame and all coordinates"""
-    frame = cv2.imread(data_entry["actual_path"])
+    frame = cv2.imread(key)
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     ball_tracking_boxes = process_boxes(data_entry["boxes"])
     transformed_coords = data_entry["transformed_coords"]
@@ -205,11 +205,18 @@ def plot_frame(
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--file_path", type=str, default="../labels/labels.jsonl")
+    parser.add_argument("--file_path", type=str, default="../labels/labels.json")
     parser.add_argument(
         "--video_path",
         type=str,
         default="../download_data/dataset/serena_v_azarenka.mp4",
+    )
+    parser.add_argument("--output_video_path1", type=str, default="tracking.mp4")
+    parser.add_argument(
+        "--output_video_path2", type=str, default="transformed_tracking.mp4"
+    )
+    parser.add_argument(
+        "--output_video_path3", type=str, default="combined_tracking.mp4"
     )
     return parser.parse_args()
 
@@ -237,33 +244,31 @@ if __name__ == "__main__":
     _, _ = video_capture.read()
     FRAME_WIDTH = int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH))
     FRAME_HEIGHT = int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    transformed_court_image = cv2.imread(
-        "/Users/derek/Desktop/tennis_tracker/tennis_tracker/player_location/padded_court.jpg"
-    )
+    transformed_court_image = cv2.imread("../player_location/padded_court.jpg")
     transformed_court_image = cv2.cvtColor(transformed_court_image, cv2.COLOR_BGR2RGB)
     COURT_HEIGHT, COURT_WIDTH, _ = transformed_court_image.shape
 
     output_video = cv2.VideoWriter(
-        "tennis_ball_tracking_output.mp4",
+        args.output_video_path1,
         cv2.VideoWriter_fourcc(*"XVID"),
         FPS,
         (FRAME_WIDTH, FRAME_HEIGHT),
     )
     output_video_2 = cv2.VideoWriter(
-        "transformed_tracking.mp4",
+        args.output_video_path2,
         cv2.VideoWriter_fourcc(*"XVID"),
         FPS,
         (COURT_WIDTH, COURT_HEIGHT),
     )
     output_video_3 = cv2.VideoWriter(
-        "combined_tracking.mp4",
+        args.output_video_path3,
         cv2.VideoWriter_fourcc(*"XVID"),
         FPS,
         (FRAME_WIDTH + COURT_WIDTH, max(FRAME_HEIGHT, COURT_HEIGHT)),
     )
 
     for i in tqdm(range(len(video_frames))):
-        frame, measurements = process_frame(data[video_frames[i]])
+        frame, measurements = process_frame(data[video_frames[i]], video_frames[i])
         court_image = transformed_court_image.copy()
         associations, current_objects, new_objects = associate_objects(
             tracked_objects=current_objects,

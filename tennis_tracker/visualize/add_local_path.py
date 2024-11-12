@@ -18,9 +18,9 @@ def get_split_box(box):
 
 
 if __name__ == "__main__":
-    FILE_PATH = ""
-    NEW_FILE_PATH = ""
-    LOCAL_PATH_TO_TENNIS_TRACKER = ""
+    FILE_PATH = "../labels/labels.json"
+    NEW_FILE_PATH = "../labels/labels_with_local_path.json"
+    LOCAL_PATH_TO_TENNIS_TRACKER = "/Users/derek/Desktop/tennis_tracker/tennis_tracker"
 
     data = read_json_file(FILE_PATH)
     
