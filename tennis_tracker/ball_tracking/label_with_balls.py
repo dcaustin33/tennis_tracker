@@ -1,3 +1,4 @@
+import argparse
 import os
 
 import cv2
@@ -25,28 +26,42 @@ def cut_image_into_quarters(image: np.array) -> list:
     image = image[:, :height, :width]
     return [image[:, :height//2, :width//2], image[:, :height//2, width//2:], image[:, height//2:, :width//2], image[:, height//2:, width//2:]]
 
-if __name__ == "__main__":
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--json_path", type=str, 
+                       default="../labels/labels.json")
+    parser.add_argument("--output_json_path", type=str,
+                       default="../labels/labels_with_balls.json")
+    parser.add_argument("--batch_size", type=int, default=3)
+    parser.add_argument("--device", type=str, 
+                       default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument("--text_prompt", type=str, default="tennis ball")
+    parser.add_argument("--box_threshold", type=float, default=0.35)
+    parser.add_argument("--text_threshold", type=float, default=0.25)
+    parser.add_argument("--model_path", type=str,
+                       default="../../GroundingDINO/groundingdino_swint_ogc.pth")
+    parser.add_argument("--model_config_path", type=str,
+                       default="../../GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py")
+    return parser.parse_args()
 
+if __name__ == "__main__":
+    args = parse_args()
     model = load_model(
-        "/home/da2986/tennis_tracker/GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py",
-        "/home/da2986/tennis_tracker/GroundingDINO/groundingdino_swint_ogc.pth",
+        args.model_config_path,
+        args.model_path,
     )
     # model = torch.compile(model)
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = args.device
     model = model.to(device)
-    TEXT_PROMPT = "tennis ball"
-    BOX_TRESHOLD = 0.35
-    TEXT_TRESHOLD = 0.25
-    JSON_PATH = (
-        # "/home/da2986/tennis_tracker/tennis_tracker/pseudo_label/clean_labels.json"
-        "/home/da2986/tennis_tracker/tennis_tracker/pseudo_label/labels_V010_v3.json"
-    )
-
+    TEXT_PROMPT = args.text_prompt
+    BOX_TRESHOLD = args.box_threshold
+    TEXT_TRESHOLD = args.text_threshold
+    JSON_PATH = args.json_path
+    OUTPUT_JSON_PATH = args.output_json_path
     data = read_json_file(JSON_PATH)
     img_paths = [img_path for img_path in data.keys()]
 
-    batch_size = 3
-    OUTPUT_JSON_PATH = "/home/da2986/tennis_tracker/tennis_tracker/ball_tracking/labels_V010_v3.json"
+    batch_size = args.batch_size
     
     if os.path.exists(OUTPUT_JSON_PATH):
         os.remove(OUTPUT_JSON_PATH)
