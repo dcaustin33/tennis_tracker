@@ -6,9 +6,9 @@ from tennis_tracker.player_location.extract_keypoints import read_json_file
 if __name__ == "__main__":
     JSON_PATH = "../labels/labels_with_balls.json"
     VIDEO_PATH = "../download_data/dataset/serena_v_azarenka.mp4"
-    
+
     data = read_json_file(JSON_PATH)
-    
+
     video_frames = []
     keys = list(data.keys())
     for key in keys:
@@ -27,7 +27,7 @@ if __name__ == "__main__":
         FPS,
         (FRAME_WIDTH, FRAME_HEIGHT),
     )
-    
+
     for i in tqdm(range(len(video_frames))):
         frame = cv2.imread(video_frames[i])
         output_video.write(frame)

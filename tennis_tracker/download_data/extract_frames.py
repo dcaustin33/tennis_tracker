@@ -6,13 +6,11 @@ import cv2
 
 if __name__ == "__main__":
     OUTPUT_PATH = "frames"
-    
+
     if not os.path.exists(OUTPUT_PATH):
         os.mkdir(OUTPUT_PATH)
 
-    all_videos = [
-        "dataset/serena_v_azarenka.mp4"
-    ]
+    all_videos = ["dataset/serena_v_azarenka.mp4"]
 
     for video_path in all_videos:
         video = cv2.VideoCapture(video_path)
@@ -23,4 +21,6 @@ if __name__ == "__main__":
 
         print(video_path)
         # Extract frames from 31:00 to 31:30
-        os.system(f"ffmpeg -i '{video_path}' -ss 1860 -t 30 -vf fps={fps} '{new_output_path}/%d.png'")
+        os.system(
+            f"ffmpeg -i '{video_path}' -ss 1860 -t 30 -vf fps={fps} '{new_output_path}/%d.png'"
+        )

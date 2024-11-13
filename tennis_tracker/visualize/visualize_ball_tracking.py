@@ -3,9 +3,7 @@ import argparse
 import cv2
 import numpy as np
 from object_tracking.kalman_filter.schema_n_adaptive_q import (
-    KalmanNDTrackerAdaptiveQ,
-    KalmanStateVectorNDAdaptiveQ,
-)
+    KalmanNDTrackerAdaptiveQ, KalmanStateVectorNDAdaptiveQ)
 from tqdm import tqdm
 
 from tennis_tracker.player_location.extract_keypoints import read_json_file
@@ -247,7 +245,7 @@ if __name__ == "__main__":
     transformed_court_image = cv2.imread("../player_location/padded_court.jpg")
     transformed_court_image = cv2.cvtColor(transformed_court_image, cv2.COLOR_BGR2RGB)
     COURT_HEIGHT, COURT_WIDTH, _ = transformed_court_image.shape
-    COURT_HEIGHT = FRAME_HEIGHT # make them the same size
+    COURT_HEIGHT = FRAME_HEIGHT  # make them the same size
 
     output_video = cv2.VideoWriter(
         args.output_video_path1,
@@ -295,7 +293,9 @@ if __name__ == "__main__":
                 )
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             court_image = cv2.cvtColor(court_image, cv2.COLOR_RGB2BGR)
-            court_image = cv2.resize(court_image, (court_image.shape[1], frame.shape[0]))
+            court_image = cv2.resize(
+                court_image, (court_image.shape[1], frame.shape[0])
+            )
             output_video.write(frame)
             output_video_2.write(court_image)
             combined_frame = np.zeros(
@@ -307,7 +307,7 @@ if __name__ == "__main__":
                 :COURT_HEIGHT, FRAME_WIDTH : FRAME_WIDTH + COURT_WIDTH, :
             ] = court_image
             output_video_3.write(combined_frame)
-            
+
             if i == len(video_frames) // 2:
                 cv2.imwrite("combined_frame.png", combined_frame)
 

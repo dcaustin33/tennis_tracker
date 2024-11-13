@@ -12,7 +12,9 @@ FRAME_WIDTH, FRAME_HEIGHT = 640, 480
 COURT_HEIGHT = 799
 COURT_WIDTH = 560
 # VIDEO_PATH = "/Users/derek/Desktop/tennis_tracker/tennis_tracker/download_data/dataset/Tiafoe Takes On Evans; Khachanov& Mannarino Also In Action ｜ Almaty 2024 Highlights Day 4 [Q1iTjk444RU].webm"
-VIDEO_PATH = "/Users/derek/Desktop/tennis_tracker/tennis_tracker/download_data/dataset/V010.mp4"
+VIDEO_PATH = (
+    "/Users/derek/Desktop/tennis_tracker/tennis_tracker/download_data/dataset/V010.mp4"
+)
 
 
 def get_next_frame(data_entry: dict, court_image: np.array):
@@ -23,7 +25,6 @@ def get_next_frame(data_entry: dict, court_image: np.array):
     for point in tracked_points:
         cv2.circle(court_image, [int(p) for p in point], 10, (0, 0, 255), -1)
     return original_image, tracked_points
-
 
 
 if __name__ == "__main__":
@@ -52,11 +53,14 @@ if __name__ == "__main__":
         original_frame, tracked_points = get_next_frame(
             data[video_frames[i]], court_image
         )
-        frame = np.zeros((max(FRAME_HEIGHT, COURT_HEIGHT), FRAME_WIDTH + COURT_WIDTH, 3), dtype=np.uint8)
+        frame = np.zeros(
+            (max(FRAME_HEIGHT, COURT_HEIGHT), FRAME_WIDTH + COURT_WIDTH, 3),
+            dtype=np.uint8,
+        )
         frame[:FRAME_HEIGHT, :FRAME_WIDTH, :] = original_frame
-        frame[:COURT_HEIGHT, FRAME_WIDTH:FRAME_WIDTH + COURT_WIDTH, :] = court_image
+        frame[:COURT_HEIGHT, FRAME_WIDTH : FRAME_WIDTH + COURT_WIDTH, :] = court_image
         output_video.write(frame)
         cv2.imshow("Tennis Tracking", frame)
-        
+
         if cv2.waitKey(int(1000 / FPS)) & 0xFF == ord("q"):
             break

@@ -2,8 +2,8 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 
-from tennis_tracker.player_location.extract_keypoints import read_json_file
-from tennis_tracker.player_location.extract_keypoints import read_court_coords
+from tennis_tracker.player_location.extract_keypoints import (
+    read_court_coords, read_json_file)
 
 
 def plot_keypoints(frame: np.array, keypoints: list[np.array]):
@@ -35,13 +35,13 @@ if __name__ == "__main__":
     frame = cv2.imread(video_frames[i])
     keypoints = data[video_frames[i]]["keypoints"]
     frame = plot_keypoints(frame, keypoints)
-    
+
     court_frame = cv2.imread("../player_location/padded_court.jpg")
     court_points = read_court_coords("../player_location/padded_click_coordinates.txt")
     court_frame = plot_keypoints(court_frame, court_points)
 
     court_frame = cv2.resize(court_frame, (court_frame.shape[1], frame.shape[0]))
-    
+
     combined_frame = np.concatenate((frame, court_frame), axis=1)
     cv2.imwrite("keypoints.png", combined_frame)
     cv2.imwrite("combined_keypoints.png", combined_frame)

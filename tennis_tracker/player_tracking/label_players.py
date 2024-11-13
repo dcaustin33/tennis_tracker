@@ -8,9 +8,7 @@ from groundingdino.util.inference import batch_predict, load_image, load_model
 from tqdm import tqdm
 
 from tennis_tracker.player_location.extract_keypoints import (
-    read_json_file,
-    write_to_json_file,
-)
+    read_json_file, write_to_json_file)
 from tennis_tracker.player_location.homography import transform_points
 
 
@@ -26,16 +24,27 @@ def parse_args():
     parser.add_argument("--json_path", type=str, default="../labels/labels.json")
     parser.add_argument("--output_json_path", type=str, default="../labels/labels.json")
     parser.add_argument("--batch_size", type=int, default=10)
-    parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
-    parser.add_argument("--model_config_path", type=str, default="../../GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py")
-    parser.add_argument("--model_checkpoint_path", type=str, default="../../GroundingDINO/groundingdino_swint_ogc.pth")
+    parser.add_argument(
+        "--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu"
+    )
+    parser.add_argument(
+        "--model_config_path",
+        type=str,
+        default="../../GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py",
+    )
+    parser.add_argument(
+        "--model_checkpoint_path",
+        type=str,
+        default="../../GroundingDINO/groundingdino_swint_ogc.pth",
+    )
     parser.add_argument("--text_prompt", type=str, default="tennis player")
     parser.add_argument("--box_threshold", type=float, default=0.35)
     parser.add_argument("--text_threshold", type=float, default=0.25)
     return parser.parse_args()
 
+
 if __name__ == "__main__":
-    
+
     args = parse_args()
 
     DEVICE = args.device
@@ -54,7 +63,7 @@ if __name__ == "__main__":
 
     batch_size = args.batch_size
     OUTPUT_JSON_PATH = args.output_json_path
-    
+
     if os.path.exists(OUTPUT_JSON_PATH):
         os.remove(OUTPUT_JSON_PATH)
 
@@ -83,14 +92,13 @@ if __name__ == "__main__":
             all_boxes = []
             for box in sorted_boxes[:3]:
                 all_boxes.append(f"0 {box[0]} {box[1]} {box[2]} {box[3]}")
-            data[batch_images[im_num]]['boxes'] = all_boxes
+            data[batch_images[im_num]]["boxes"] = all_boxes
             lines.append(all_boxes)
-            
+
             # now we translate to the world coords
-            image_dims = data[batch_images[im_num]]['image_dims'].copy()
-            m = np.array(data[batch_images[im_num]]['m'].copy())
+            image_dims = data[batch_images[im_num]]["image_dims"].copy()
+            m = np.array(data[batch_images[im_num]]["m"].copy())
             transformed_points = transform_points(m, sorted_boxes[:3], image_dims)
-            data[batch_images[im_num]]['transformed_coords'] = transformed_points
-            
-            
+            data[batch_images[im_num]]["transformed_coords"] = transformed_points
+
     write_to_json_file(OUTPUT_JSON_PATH, data)

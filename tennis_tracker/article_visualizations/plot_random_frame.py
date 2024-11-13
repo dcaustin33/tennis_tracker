@@ -36,22 +36,18 @@ if __name__ == "__main__":
     video_frames = [x[0] for x in video_frames]
 
     i = 10
-    _, measurements = process_frame(
-        data[video_frames[i]], video_frames[i]
-    )
+    _, measurements = process_frame(data[video_frames[i]], video_frames[i])
     frame = cv2.imread(video_frames[i])
     frame = plot_boxes(frame, measurements)
-    
+
     i = 80
-    _, measurements = process_frame(
-        data[video_frames[i]], video_frames[i]
-    )
+    _, measurements = process_frame(data[video_frames[i]], video_frames[i])
     frame2 = cv2.imread(video_frames[i])
     frame2 = plot_boxes(frame2, measurements)
-    
+
     # combine the two frames
     combined_frame = np.concatenate((frame, frame2), axis=1)
-    
+
     cv2.imwrite("frame.png", frame)
     cv2.imwrite("frame2.png", frame2)
     cv2.imwrite("combined_frame.png", combined_frame)

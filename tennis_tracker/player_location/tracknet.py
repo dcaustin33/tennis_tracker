@@ -3,16 +3,26 @@ import torch.nn as nn
 
 
 class ConvBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size=3, pad=1, stride=1, bias=True):
+    def __init__(
+        self, in_channels, out_channels, kernel_size=3, pad=1, stride=1, bias=True
+    ):
         super().__init__()
         self.block = nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, kernel_size, stride=stride, padding=pad, bias=bias),
+            nn.Conv2d(
+                in_channels,
+                out_channels,
+                kernel_size,
+                stride=stride,
+                padding=pad,
+                bias=bias,
+            ),
             nn.ReLU(),
-            nn.BatchNorm2d(out_channels)
+            nn.BatchNorm2d(out_channels),
         )
 
     def forward(self, x):
         return self.block(x)
+
 
 class BallTrackerNet(nn.Module):
     def __init__(self, out_channels=14):
@@ -45,10 +55,10 @@ class BallTrackerNet(nn.Module):
         self.conv18 = ConvBlock(in_channels=64, out_channels=self.out_channels)
 
         self._init_weights()
-                  
+
     def forward(self, x):
         x = self.conv1(x)
-        x = self.conv2(x)    
+        x = self.conv2(x)
         x = self.pool1(x)
         x = self.conv3(x)
         x = self.conv4(x)
@@ -72,7 +82,7 @@ class BallTrackerNet(nn.Module):
         x = self.conv17(x)
         x = self.conv18(x)
         return x
-    
+
     def _init_weights(self):
         for module in self.modules():
             if isinstance(module, nn.Conv2d):
@@ -82,15 +92,16 @@ class BallTrackerNet(nn.Module):
 
             elif isinstance(module, nn.BatchNorm2d):
                 nn.init.constant_(module.weight, 1)
-                nn.init.constant_(module.bias, 0)   
-                
-if __name__ == '__main__':
-    device = 'mps'
+                nn.init.constant_(module.bias, 0)
+
+
+if __name__ == "__main__":
+    device = "mps"
     model = BallTrackerNet().to(device)
     module = torch.load("model_tennis_court_det.pt", map_location=device)
-    import pdb; pdb.set_trace()
+    import pdb
+
+    pdb.set_trace()
     inp = torch.rand(1, 3, 360, 640).to(device)
     out = model(inp)
-    print('out = {}'.format(out.shape))
-    
-    
+    print("out = {}".format(out.shape))
