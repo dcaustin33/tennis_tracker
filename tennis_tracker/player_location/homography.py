@@ -45,11 +45,13 @@ def read_court_coords(file_path: str):
     lines = [line.strip().split(",") for line in lines]
     return [[int(x), int(y)] for x, y in lines]
 
+
 def output_point(m: np.array, points: np.array) -> list:
     """points should be in shape (-1, 1, 2)"""
     outputs = cv2.perspectiveTransform(points, m)
     # output will be -1, 1, 2
     return outputs.reshape(-1, 2)
+
 
 def transform_points(m: np.array, all_boxes: list, image_dims: tuple) -> list:
     """
@@ -66,7 +68,7 @@ def transform_points(m: np.array, all_boxes: list, image_dims: tuple) -> list:
             cx, cy, w, h = box.cpu()
         else:
             cx, cy, w, h = box
-        ankles_point = [cx, cy+h/2]
+        ankles_point = [cx, cy + h / 2]
         ankles_point[0] *= image_dims[0]
         ankles_point[1] *= image_dims[1]
         all_points.append(ankles_point)

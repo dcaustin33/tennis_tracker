@@ -1,11 +1,7 @@
-
-
 import cv2
 import numpy as np
 from object_tracking.kalman_filter.schema_n_adaptive_q import (
-    KalmanNDTrackerAdaptiveQ,
-    KalmanStateVectorNDAdaptiveQ,
-)
+    KalmanNDTrackerAdaptiveQ, KalmanStateVectorNDAdaptiveQ)
 from tqdm import tqdm
 
 from tennis_tracker.player_location.extract_keypoints import read_json_file
@@ -156,39 +152,38 @@ def select_ball_object(tracked_objects: list[tuple[KalmanNDTrackerAdaptiveQ, int
         # Get width and height from state matrix
         width = tracked_object.state.state_matrix[2]
         height = tracked_object.state.state_matrix[3]
-        
+
         velocity_x = tracked_object.state.state_matrix[7]
         velocity_y = tracked_object.state.state_matrix[8]
-        
+
         velocity = np.sqrt(velocity_x**2 + velocity_y**2)
         if velocity < 10:
             continue
         # Get RGB values from state matrix
         red = tracked_object.state.state_matrix[4]
-        green = tracked_object.state.state_matrix[5] 
+        green = tracked_object.state.state_matrix[5]
         blue = tracked_object.state.state_matrix[6]
-        
+
         # Skip if width or height too large
         if width > 15 or height > 15:
             continue
-        
-            
+
         # Calculate yellow score (high red and green, low blue)
-        yellow_score = (red + green)/2 - blue
-        
+        yellow_score = (red + green) / 2 - blue
+
         if yellow_score > max_yellow_score:
             max_yellow_score = yellow_score
             max_idx = i
-            
+
     if max_idx is None:
         return None
-        
+
     return tracked_objects[max_idx]
 
 
 def plot_frame(frame: np.array, tracked_object: tuple[KalmanNDTrackerAdaptiveQ, int]):
     """Plot the frame with the tracked objects"""
-    
+
     if tracked_object is None:
         return frame
     tracked_object, _ = tracked_object
@@ -313,7 +308,7 @@ if __name__ == "__main__":
     _, _ = video_capture.read()
     FRAME_WIDTH = int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH))
     FRAME_HEIGHT = int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    
+
     output_video = cv2.VideoWriter(
         "tennis_ball_tracking_output.mp4",
         cv2.VideoWriter_fourcc(*"XVID"),
@@ -336,7 +331,6 @@ if __name__ == "__main__":
         # have already predicted so just need to update
         for key, value in associations.items():
             current_objects[key][0].update(measurements[value], predict=False)
-
 
         current_objects.extend(new_objects)
 
