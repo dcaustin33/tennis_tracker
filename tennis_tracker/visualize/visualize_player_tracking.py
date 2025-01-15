@@ -3,7 +3,9 @@ import argparse
 import cv2
 import numpy as np
 from object_tracking.kalman_filter.schema_n_adaptive_q import (
-    KalmanNDTrackerAdaptiveQ, KalmanStateVectorNDAdaptiveQ)
+    KalmanNDTrackerAdaptiveQ,
+    KalmanStateVectorNDAdaptiveQ,
+)
 from tqdm import tqdm
 
 from tennis_tracker.player_location.extract_keypoints import read_json_file
